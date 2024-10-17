@@ -1,45 +1,20 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="110px">
       <el-form-item label="部门名称" prop="departmentName">
-        <el-input
-          v-model="queryParams.departmentName"
-          placeholder="请输入部门名称"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+        <el-input v-model="queryParams.departmentName" placeholder="请输入部门名称" clearable @keyup.enter="handleQuery" />
       </el-form-item>
       <el-form-item label="客户单位id" prop="clientUnitId">
-        <el-input
-          v-model="queryParams.clientUnitId"
-          placeholder="请输入客户单位id"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+        <el-input v-model="queryParams.clientUnitId" placeholder="请输入客户单位id" clearable @keyup.enter="handleQuery" />
       </el-form-item>
       <el-form-item label="部门联系人姓名" prop="contactsName">
-        <el-input
-          v-model="queryParams.contactsName"
-          placeholder="请输入部门联系人姓名"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+        <el-input v-model="queryParams.contactsName" placeholder="请输入部门联系人姓名" clearable @keyup.enter="handleQuery" />
       </el-form-item>
       <el-form-item label="联系人电话" prop="contactsMobile">
-        <el-input
-          v-model="queryParams.contactsMobile"
-          placeholder="请输入联系人电话"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+        <el-input v-model="queryParams.contactsMobile" placeholder="请输入联系人电话" clearable @keyup.enter="handleQuery" />
       </el-form-item>
       <el-form-item label="联系人职务" prop="duties">
-        <el-input
-          v-model="queryParams.duties"
-          placeholder="请输入联系人职务"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+        <el-input v-model="queryParams.duties" placeholder="请输入联系人职务" clearable @keyup.enter="handleQuery" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -49,49 +24,27 @@
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="Plus"
-          @click="handleAdd"
-          v-hasPermi="['chanhu:department:add']"
-        >新增</el-button>
+        <el-button type="primary" plain icon="Plus" @click="handleAdd"
+          v-hasPermi="['chanhu:department:add']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="Edit"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['chanhu:department:edit']"
-        >修改</el-button>
+        <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate"
+          v-hasPermi="['chanhu:department:edit']">修改</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="Delete"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['chanhu:department:remove']"
-        >删除</el-button>
+        <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete"
+          v-hasPermi="['chanhu:department:remove']">删除</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="Download"
-          @click="handleExport"
-          v-hasPermi="['chanhu:department:export']"
-        >导出</el-button>
+        <el-button type="warning" plain icon="Download" @click="handleExport"
+          v-hasPermi="['chanhu:department:export']">导出</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="departmentList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="${comment}" align="center" prop="id" />
+      <!-- <el-table-column label="${comment}" align="center" prop="id" /> -->
       <el-table-column label="部门名称" align="center" prop="departmentName" />
       <el-table-column label="客户单位id" align="center" prop="clientUnitId" />
       <el-table-column label="部门联系人姓名" align="center" prop="contactsName" />
@@ -100,23 +53,20 @@
       <el-table-column label="备注" align="center" prop="comments" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
-          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['chanhu:department:edit']">修改</el-button>
-          <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['chanhu:department:remove']">删除</el-button>
+          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
+            v-hasPermi="['chanhu:department:edit']">修改</el-button>
+          <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
+            v-hasPermi="['chanhu:department:remove']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    
-    <pagination
-      v-show="total>0"
-      :total="total"
-      v-model:page="queryParams.pageNum"
-      v-model:limit="queryParams.pageSize"
-      @pagination="getList"
-    />
+
+    <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize"
+      @pagination="getList" />
 
     <!-- 添加或修改客户单位部门管理对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
-      <el-form ref="departmentRef" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="departmentRef" :model="form" :rules="rules" label-width="110px">
         <el-form-item label="部门名称" prop="departmentName">
           <el-input v-model="form.departmentName" placeholder="请输入部门名称" />
         </el-form-item>
@@ -148,6 +98,7 @@
 
 <script setup name="Department">
 import { listDepartment, getDepartment, delDepartment, addDepartment, updateDepartment } from "@/api/chanhu/department";
+import { useRoute } from "vue-router";
 
 const { proxy } = getCurrentInstance();
 
@@ -270,12 +221,12 @@ function submitForm() {
 /** 删除按钮操作 */
 function handleDelete(row) {
   const _ids = row.id || ids.value;
-  proxy.$modal.confirm('是否确认删除客户单位部门管理编号为"' + _ids + '"的数据项？').then(function() {
+  proxy.$modal.confirm('是否确认删除客户单位部门管理编号为"' + _ids + '"的数据项？').then(function () {
     return delDepartment(_ids);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");
-  }).catch(() => {});
+  }).catch(() => { });
 }
 
 /** 导出按钮操作 */
@@ -284,6 +235,18 @@ function handleExport() {
     ...queryParams.value
   }, `department_${new Date().getTime()}.xlsx`)
 }
+
+
+// 怎么接受另一个页面传过来的clientUnitId参数，然后加载数据
+// contract也是
+const route = useRoute();
+const clientUnitId = route.query.clientUnitId;
+
+
+queryParams.clientUnitId = clientUnitId;
+console.log(queryParams.clientUnitId);
+
+
 
 getList();
 </script>
