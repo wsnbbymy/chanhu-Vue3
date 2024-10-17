@@ -38,25 +38,7 @@
 
     <el-table v-loading="loading" :data="process_clientList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column type="expand">
-        <template #default="scope">
-          <el-table :data="scope.row.children" style="width: 100%">
-            <el-table-column prop="departmentName" label="部门名称"></el-table-column>
-            <el-table-column prop="contactsName" label="联系人姓名"></el-table-column>
-            <el-table-column prop="contactsMobile" label="联系电话"></el-table-column>
-            <el-table-column prop="duties" label="职务"></el-table-column>
-            <el-table-column prop="comments" label="部门备注"></el-table-column>
-            <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-              <template #default="scope">
-                <el-button link type="primary" icon="Edit" @click="handleUpdateDepartment(scope.row)"
-                  v-hasPermi="['chanhu:department:edit']">修改</el-button>
-                <el-button link type="primary" icon="Delete" @click="handleDeleteDepartment(scope.row)"
-                  v-hasPermi="['chanhu:department:remove']">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </template>
-      </el-table-column>
+
       <!-- <el-table-column label="${comment}" align="center" prop="id" /> -->
       <el-table-column label="客户单位" align="center" prop="clientName" />
       <el-table-column label="员工人数" align="center" prop="employerNum" />
@@ -64,9 +46,14 @@
       <el-table-column label="备注" align="center" prop="comments" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
+          <!-- 部门列表弹窗 -->
+          <el-button link type="primary" icon="Search" @click="handleListDepartment(scope.row)"
+            v-hasPermi="['chanhu:department:list']">部门列表</el-button>
           <!-- 新增部门按钮 -->
-           <el-button link type="primary" icon="Plus" @click="handleAddDepartment(scope.row)"
-            v-hasPermi="['chanhu:department:add']">新增部门</el-button>
+          <!-- <el-button link type="primary" icon="Plus" @click="handleAddDepartment(scope.row)"
+            v-hasPermi="['chanhu:department:add']">新增部门</el-button> -->
+          <el-button link type="primary" icon="Search" @click="toContract(scope.row)"
+            v-hasPermi="['chanhu:contract:list']">合同列表</el-button>
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['chanhu:process_client:edit']">修改</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
@@ -76,8 +63,8 @@
 
     </el-table>
 
-    <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize"
-      @pagination="getList" />
+    <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum"
+      v-model:limit="queryParams.pageSize" @pagination="getList" />
 
     <!-- 添加或修改客户信息对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
@@ -129,12 +116,34 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 客户单位部门列表对话框 -->
+    <el-dialog title="部门列表" v-model="openDepartmentList" width="1200px" append-to-body height="1000px">
+      <el-table :data="departmentList" style="width: 100%">
+        <el-table-column prop="departmentName" label="部门名称"></el-table-column>
+        <el-table-column prop="contactsName" label="联系人姓名"></el-table-column>
+        <el-table-column prop="contactsMobile" label="联系电话"></el-table-column>
+        <el-table-column prop="duties" label="职务"></el-table-column>
+        <el-table-column prop="comments" label="部门备注"></el-table-column>
+        <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+          <template #default="scope">
+            <!-- 合同列表，跳转到"/contracts"，并且传入当前部门id -->
+            <el-button link type="primary" icon="Search" @click="toContract(scope.row)"
+              v-hasPermi="['chanhu:contract:list']">合同列表</el-button>
+            <el-button link type="primary" icon="Edit" @click="handleUpdateDepartment(scope.row)"
+              v-hasPermi="['chanhu:department:edit']">修改</el-button>
+            <el-button link type="primary" icon="Delete" @click="handleDeleteDepartment(scope.row)"
+              v-hasPermi="['chanhu:department:remove']">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
 <script setup name="Process_client">
 import { listProcess_client, getProcess_client, delProcess_client, addProcess_client, updateProcess_client } from "@/api/chanhu/process_client";
-import { getDepartment, delDepartment, updateDepartment, addDepartment} from "@/api/chanhu/department";
+import { getDepartment, delDepartment, updateDepartment, addDepartment, listDepartment } from "@/api/chanhu/department";
 import { ref } from "vue";
 
 const { proxy } = getCurrentInstance();
@@ -296,7 +305,7 @@ function handleAddDepartment(row) {
   };
   console.log(clientUnitId);
   console.log(departmentForm.value);
-  
+
   departmentTitle.value = "添加客户单位部门管理";
 }
 
@@ -315,7 +324,7 @@ function resetDepartmentForm() {
 /** 删除部门按钮操作 */
 function handleDeleteDepartment(row) {
   const _ids = row.id || ids.value;
-  
+
   proxy.$modal.confirm('是否确认删除客户信息编号为"' + row.departmentName + '"的数据项？').then(function () {
     return delDepartment(_ids);
   }).then(() => {
@@ -345,7 +354,26 @@ function submitDepartmentForm() {
   });
 }
 
+// 部门列表弹窗
+const openDepartmentList = ref(false);
+// 部门列表
+const departmentList = ref([]);
 
+/** 打开部门列表弹窗 */
+function handleListDepartment() {
+  openDepartmentList.value = true;
+  listDepartment({ clientUnitId: departmentForm.value.clientUnitId }).then(response => {
+    departmentList.value = response.rows;
+  });
+}
+
+// todo
+/** 合同列表，跳转到"/contracts"，并且传入当前部门id */
+function toContract(row) {
+  openDepartmentList.value = false;
+  // todo
+  proxy.$router.push({ path: '/contracts', query: { departmentId: row.id } });
+}
 
 getList();
 </script>
