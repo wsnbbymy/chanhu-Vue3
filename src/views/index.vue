@@ -1,8 +1,8 @@
 <template>
   <div class="app-container home">
-    <h1>重要客户需求管理系统</h1>
-    <!-- 显示一些系统描述 -->
-     <p>本系统为内部使用</p>
+    <h1>欢迎来到重要客户项目需求管理系统</h1>
+    <p>本系统旨在通过高效、透明的方式管理和跟踪客户项目中的各项需求，确保团队之间以及与客户之间的沟通顺畅无阻。</p>
+    <p>期待与您携手共创美好未来！</p>
   </div>
 </template>
 
@@ -39,7 +39,7 @@ function goTarget(url) {
 
   font-family: "open sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
-  color: #676a6c;
+  color: #262728;
   overflow-x: hidden;
 
   ul {

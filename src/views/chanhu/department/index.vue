@@ -243,7 +243,7 @@ const route = useRoute();
 const clientUnitId = route.query.clientUnitId;
 
 
-queryParams.clientUnitId = clientUnitId;
+queryParams.value.clientUnitId = clientUnitId;
 console.log(queryParams.clientUnitId);
 
 
