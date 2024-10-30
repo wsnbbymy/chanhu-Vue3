@@ -1,65 +1,108 @@
 <template>
-    <el-menu class="el-menu-vertical" @open="handleOpen" @close="handleClose" unique-opened>
-        <el-sub-menu index="1">
-            <template #title>
-                Navigator One
-            </template>
-            <el-menu-item index="1-1">item 1</el-menu-item>
-            <el-menu-item index="1-2">item 2</el-menu-item>
-            <el-menu-item index="1-3">item 3</el-menu-item>
-            <el-menu-item index="1-4">item 4</el-menu-item>
-            <el-sub-menu index="1-5">
-                <template #title>
-                    Navigator 1-5
+    <el-row>
+        <el-col :span="4">
+            <el-menu :default-active="activeIndex" class="el-menu-vertical-demo" @select="handleSelect" unique-opened>
+                <template v-for="item in menuItems" :key="item.id">
+                    <!-- 一级菜单 -->
+                    <el-sub-menu v-if="item.children.length" :index="item.menuIndex">
+                        <template #title>
+                            <el-icon>
+                                <Close />
+                            </el-icon>
+                            {{ item.label }}
+                        </template>
+                        <!-- 二级菜单 -->
+                        <template v-for="child in item.children" :key="child.id">
+                            <el-sub-menu v-if="child.children.length" :index="child.menuIndex">
+                                <template #title><el-icon>
+                                        <Close />
+                                    </el-icon>{{ child.label }}</template>
+                                <!-- 三级菜单 -->
+                                <template v-for="grandChild in child.children" :key="grandChild.id">
+                                    <el-menu-item :index="grandChild.menuIndex">
+                                        <el-icon>
+                                            <Close />
+                                        </el-icon>
+                                        {{ grandChild.label }}
+                                    </el-menu-item>
+                                </template>
+                            </el-sub-menu>
+                            <el-menu-item v-else :index="child.menuIndex">
+                                <el-icon>
+                                    <Close />
+                                </el-icon>
+                                {{ child.label }}
+                            </el-menu-item>
+                        </template>
+                    </el-sub-menu>
+                    <el-menu-item v-else :index="item.menuIndex">
+                        <el-icon>
+                            <Close />
+                        </el-icon>
+                        {{ item.label }}
+                    </el-menu-item>
                 </template>
-                <el-menu-item index="1-5-1">item 1</el-menu-item>
-                <el-menu-item index="1-5-2">item 2</el-menu-item>
-                <el-menu-item index="1-5-3">item 3</el-menu-item>
-                <el-menu-item index="1-5-4">item 4</el-menu-item>
-            </el-sub-menu>
-        </el-sub-menu>
-        <el-sub-menu index="2">
-            <template #title>
-                Navigator Two
-            </template>
-            <el-menu-item index="2-1">item 1</el-menu-item>
-            <el-menu-item index="2-2">item 2</el-menu-item>
-            <el-menu-item index="2-3">item 3</el-menu-item>
-            <el-menu-item index="2-4">item 4</el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="3">
-            <template #title>
-                Navigator Two
-            </template>
-            <el-menu-item index="3-1">item 1</el-menu-item>
-            <el-menu-item index="3-2">item 2</el-menu-item>
-            <el-menu-item index="3-3">item 3</el-menu-item>
-            <el-menu-item index="3-4">item 4</el-menu-item>
-        </el-sub-menu>
+            </el-menu>
+        </el-col>
+        <el-col :span="20">
+            {{ data }}
+        </el-col>
+    </el-row>
 
-    </el-menu>
+
 </template>
 
-<script lang="ts" setup>
-import { ref } from 'vue'
-import {
-    Document,
-    Menu as IconMenu,
-    Location,
-    Setting,
-} from '@element-plus/icons-vue'
+<script setup>
+import { ref } from 'vue';
+import { getContractsMenu } from '@/api/chanhu/contracts_nemu';
 
-const handleOpen = (key: string, keyPath: string[]) => {
-    console.log(key, keyPath)
+import { Close } from '@element-plus/icons-vue'
+
+// 多级菜单数据
+// const menuItems = ref([
+//     { index: '1', label: '首页' },
+//     {
+//         index: '2',
+//         label: '产品',
+//         children: [
+//             { index: '2-1', label: '产品1' },
+//             { index: '2-2', label: '产品2' },
+//             { index: '2-3', label: '产品3' }
+//         ]
+//     },
+//     {
+//         index: '3',
+//         label: '服务',
+//         children: [
+//             { index: '3-1', label: '服务1' },
+//             { index: '3-2', label: '服务2' }
+//         ]
+//     },
+//     { index: '4', label: '关于我们' }
+// ]);
+const menuItems = ref([]);
+
+// 当前激活的菜单项
+const activeIndex = ref('1');
+
+const data = ref("")
+// 菜单项点击事件处理
+const handleSelect = (index) => {
+    console.log('Selected item:', index);
+    // 这里可以添加跳转逻辑或其他操作
+    data.value = index;
+};
+
+function getMenu() {
+    getContractsMenu().then(response => {
+        console.log(response);
+        menuItems.value = response;
+    });
 }
-const handleClose = (key: string, keyPath: string[]) => {
-    console.log(key, keyPath)
-}
+
+getMenu();
 </script>
 
-<style>
-.el-menu-vertical:not(.el-menu--collapse) {
-    width: 200px;
-    min-height: 400px;
-}
+<style scoped>
+/* 你可以在这里添加自定义样式 */
 </style>

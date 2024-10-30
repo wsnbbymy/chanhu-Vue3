@@ -53,6 +53,8 @@
       <el-table-column label="备注" align="center" prop="comments" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
+          <el-button link type="primary" icon="Plus" @click="toAddContract(scope.row)"
+          v-hasPermi="['chanhu:contract:add']">新增合同</el-button>
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['chanhu:department:edit']">修改</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
@@ -236,17 +238,14 @@ function handleExport() {
   }, `department_${new Date().getTime()}.xlsx`)
 }
 
+function toAddContract(row) {
+  proxy.$router.push({ path: '/contracts/add',query: { deprtmentId: row.id} });
+}
 
-// 怎么接受另一个页面传过来的clientUnitId参数，然后加载数据
-// contract也是
+// 接受客户页面传来的客户id
 const route = useRoute();
 const clientUnitId = route.query.clientUnitId;
-
-
 queryParams.value.clientUnitId = clientUnitId;
-console.log(queryParams.clientUnitId);
-
-
 
 getList();
 </script>

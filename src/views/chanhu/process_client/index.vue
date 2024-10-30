@@ -47,8 +47,11 @@
           <!-- 部门列表弹窗 -->
           <el-button link type="primary" icon="Search" @click="toDepartment(scope.row)"
             v-hasPermi="['chanhu:department:list']">部门列表</el-button>
-          <el-button link type="primary" icon="Search" @click="toContract(scope.row)"
-            v-hasPermi="['chanhu:contract:list']">合同列表</el-button>
+          <!-- <el-button link type="primary" icon="Search" @click="toContract(scope.row)"
+            v-hasPermi="['chanhu:contract:list']">合同列表</el-button> -->
+          <!-- 新增合同 -->
+          <el-button link type="primary" icon="Plus" @click="toAddContract(scope.row)"
+            v-hasPermi="['chanhu:contract:add']">新增合同</el-button>
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['chanhu:process_client:edit']">修改</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
@@ -85,39 +88,11 @@
       </template>
     </el-dialog>
 
-    <!-- 添加或修改客户单位部门管理对话框 -->
-    <el-dialog :title="title" v-model="openDepartment" width="500px" append-to-body>
-      <el-form ref="departmentRef" :model="departmentForm" :rules="rules" label-width="80px">
-        <el-form-item label="部门名称" prop="departmentName">
-          <el-input v-model="departmentForm.departmentName" placeholder="请输入部门名称" />
-        </el-form-item>
-        <el-form-item label="部门联系人姓名" prop="contactsName">
-          <el-input v-model="departmentForm.contactsName" placeholder="请输入部门联系人姓名" />
-        </el-form-item>
-        <el-form-item label="联系人电话" prop="contactsMobile">
-          <el-input v-model="departmentForm.contactsMobile" placeholder="请输入联系人电话" />
-        </el-form-item>
-        <el-form-item label="联系人职务" prop="duties">
-          <el-input v-model="departmentForm.duties" placeholder="请输入联系人职务" />
-        </el-form-item>
-        <el-form-item label="备注" prop="comments">
-          <el-input v-model="departmentForm.comments" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button type="primary" @click="submitDepartmentForm">确 定</el-button>
-          <el-button @click="cancelDepartment">取 消</el-button>
-        </div>
-      </template>
-    </el-dialog>
-
   </div>
 </template>
 
 <script setup name="Process_client">
 import { listProcess_client, getProcess_client, delProcess_client, addProcess_client, updateProcess_client } from "@/api/chanhu/process_client";
-import { getDepartment, delDepartment, updateDepartment, addDepartment, listDepartment } from "@/api/chanhu/department";
 import { ref } from "vue";
 
 const { proxy } = getCurrentInstance();
@@ -131,9 +106,6 @@ const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 const title = ref("");
-const departmentTitle = ref("");
-const departmentForm = ref("");
-const openDepartment = ref(false);
 
 const data = reactive({
   form: {},
@@ -258,87 +230,13 @@ function handleExport() {
   }, `process_client_${new Date().getTime()}.xlsx`)
 }
 
-/** 修改部门按钮操作 */
-function handleUpdateDepartment(row) {
-  resetDepartmentForm();
-  const _id = row.id || ids.value
-  getDepartment(_id).then(response => {
-    departmentForm.value = response.data;
-    openDepartment.value = true;
-    departmentTitle.value = "修改客户单位部门管理";
-  });
-}
-
-/** 新增部门按钮操作 */
-function handleAddDepartment(row) {
-  resetDepartmentForm();
-  openDepartment.value = true;
-  var clientUnitId = row.id;
-  departmentForm.value = {
-    clientUnitId: clientUnitId
-  };
-  console.log(clientUnitId);
-  console.log(departmentForm.value);
-
-  departmentTitle.value = "添加客户单位部门管理";
-}
-
-// 取消部门修改按钮
-function cancelDepartment() {
-  openDepartment.value = false;
-  resetDepartmentForm();
-}
-
-// 重置修改部门表单
-function resetDepartmentForm() {
-  departmentForm.value = {};
-  proxy.resetForm("departmentRef");
-}
-
-/** 删除部门按钮操作 */
-function handleDeleteDepartment(row) {
-  const _ids = row.id || ids.value;
-
-  proxy.$modal.confirm('是否确认删除客户信息编号为"' + row.departmentName + '"的数据项？').then(function () {
-    return delDepartment(_ids);
-  }).then(() => {
-    getList();
-    proxy.$modal.msgSuccess("删除成功");
-  }).catch(() => { });
-}
-
-/** 提交按钮 */
-function submitDepartmentForm() {
-  proxy.$refs["departmentRef"].validate(valid => {
-    if (valid) {
-      if (departmentForm.value.id != null) {
-        updateDepartment(departmentForm.value).then(response => {
-          proxy.$modal.msgSuccess("修改成功");
-          openDepartment.value = false;
-          getList();
-        });
-      } else {
-        addDepartment(departmentForm.value).then(response => {
-          proxy.$modal.msgSuccess("新增成功");
-          openDepartment.value = false;
-          getList();
-        });
-      }
-    }
-  });
-}
-
-
-// todo
-/** 合同列表，跳转到"/contracts"，并且传入当前部门id */
-function toContract(row) {
-  // todo
-  proxy.$router.push({ path: '/contracts', query: { departmentId: row.id } });
-}
-
 /** 跳转到当前单位的部门列表页面 */
 function toDepartment(row) {
   proxy.$router.push({ path: '/department', query: { clientUnitId: row.id } });
+}
+
+function toAddContract(row) {
+  proxy.$router.push({ path: '/contracts/add',query: { clientUnitId: row.id} });
 }
 
 getList();
