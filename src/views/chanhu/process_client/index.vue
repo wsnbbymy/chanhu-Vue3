@@ -42,7 +42,7 @@
       <el-table-column label="员工人数" align="center" prop="employerNum" />
       <el-table-column label="行业" align="center" prop="industry" />
       <el-table-column label="备注" align="center" prop="comments" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="320px" fixed="right">
         <template #default="scope">
           <!-- 部门列表弹窗 -->
           <el-button link type="primary" icon="Search" @click="toDepartment(scope.row)"

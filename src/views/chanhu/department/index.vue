@@ -51,7 +51,7 @@
       <el-table-column label="联系人电话" align="center" prop="contactsMobile" />
       <el-table-column label="联系人职务" align="center" prop="duties" />
       <el-table-column label="备注" align="center" prop="comments" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="280px" fixed="right">
         <template #default="scope">
           <el-button link type="primary" icon="Plus" @click="toAddContract(scope.row)"
           v-hasPermi="['chanhu:contract:add']">新增合同</el-button>

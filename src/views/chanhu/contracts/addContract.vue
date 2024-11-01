@@ -47,7 +47,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { getContractsMenu } from '@/api/chanhu/contracts_nemu';
+import { getContractsMenu } from '@/api/chanhu/process_contracts_menu';
 
 import { Close } from '@element-plus/icons-vue'
 
