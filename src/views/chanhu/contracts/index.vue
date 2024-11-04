@@ -34,10 +34,10 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-      <!-- <el-col :span="1.5">
+      <el-col :span="1.5">
         <el-button type="primary" plain icon="Plus" @click="handleAdd"
           v-hasPermi="['chanhu:contracts:add']">新增</el-button>
-      </el-col> -->
+      </el-col>
       <el-col :span="1.5">
         <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate"
           v-hasPermi="['chanhu:contracts:edit']">修改</el-button>
@@ -93,54 +93,14 @@
       v-model:limit="queryParams.pageSize" @pagination="getList" />
 
     <!-- 添加或修改合同管理对话框 -->
-    <el-dialog :title="title" v-model="open" width="500px" append-to-body>
-      <el-form ref="contractsRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="合同类型" prop="contractType">
-          <el-input v-model="form.contractType" placeholder="请输入合同类型" />
-        </el-form-item>
-        <el-form-item label="供应商" prop="provider">
-          <el-select v-model="form.provider" placeholder="请选择供应商">
-            <el-option v-for="dict in process_provider" :key="dict.value" :label="dict.label"
-              :value="parseInt(dict.value)"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="开始日期" prop="startDate">
-          <el-date-picker clearable v-model="form.startDate" type="date" value-format="YYYY-MM-DD"
-            placeholder="请选择开始日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="终止日期" prop="endDate">
-          <el-date-picker clearable v-model="form.endDate" type="date" value-format="YYYY-MM-DD" placeholder="请选择终止日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="具体信息" prop="detail">
-          <el-input v-model="form.detail" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
-        <el-form-item label="备注" prop="comments">
-          <el-input v-model="form.comments" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
-        <el-form-item label="部门" prop="departmentId">
-          <el-select v-model="form.departmentId" v-if="departments.length">
-            <el-option v-for="department in departments" :key="department.id" :value="department.id"
-              :label="department.departmentName">
-              {{ department.departmentName }}
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button type="primary" @click="submitForm">确 定</el-button>
-          <el-button @click="cancel">取 消</el-button>
-        </div>
-      </template>
-    </el-dialog>
+    <AddModel ref="addmodel"></AddModel>
   </div>
 </template>
 
 <script setup name="Contracts">
 import { listContracts, getContracts, delContracts, addContracts, updateContracts } from "@/api/chanhu/contracts";
 import { listDepartment } from "@/api/chanhu/department";
+import AddModel from "@/views/chanhu/contracts/addContractModel"
 
 const { proxy } = getCurrentInstance();
 const { process_provider } = proxy.useDict('process_provider');
@@ -233,7 +193,7 @@ function handleSelectionChange(selection) {
 /** 新增按钮操作 */
 function handleAdd() {
   reset();
-  open.value = true;
+  proxy.$refs.addmodel.visControl()
   title.value = "添加合同管理";
 }
 
