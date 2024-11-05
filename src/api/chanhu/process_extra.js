@@ -7,3 +7,20 @@ export function getOperators() {
     method: 'get',
   })
 }
+
+export function createOperators(data) {
+  return request({
+    url: '/chanhu/process_client/createOperators',
+    data: data,
+    method: 'post',
+  })
+}
+
+
+export function updateOperators(data) {
+  return request({
+    url: '/chanhu/process_client/updateOperators',
+    data: data,
+    method: 'post',
+  })
+}
